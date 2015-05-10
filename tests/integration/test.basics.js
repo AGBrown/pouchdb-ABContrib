@@ -51,14 +51,13 @@ adapters.forEach(function (adapter) {
       });
     });
 
-    it('destroy a pouch, with a promise', function (done) {
-      new PouchDB(dbs.name, function (err, db) {
+    it('destroy a pouch, with a promise', function () {
+      return new PouchDB(dbs.name).then(function (db) {
         should.exist(db);
-        db.destroy().then(function (info) {
-          should.exist(info);
-          info.ok.should.equal(true);
-          done();
-        }, done);
+        return db.destroy();
+      }).then(function (info) {
+        should.exist(info);
+        info.ok.should.equal(true);
       });
     });
 
@@ -70,11 +69,9 @@ adapters.forEach(function (adapter) {
       });
     });
 
-    it('Add a doc with a promise', function (done) {
+    it('Add a doc with a promise', function () {
       var db = new PouchDB(dbs.name);
-      db.post({test: 'somestuff'}).then(function (info) {
-        done();
-      }, done);
+      return db.post({ test: 'somestuff' });
     });
 
     it('Modify a doc', function (done) {
@@ -121,9 +118,9 @@ adapters.forEach(function (adapter) {
       });
     });
 
-    it('Modify a doc with a promise', function (done) {
+    it('Modify a doc with a promise', function () {
       var db = new PouchDB(dbs.name);
-      db.post({test: 'promisestuff'}).then(function (info) {
+      return db.post({test: 'promisestuff'}).then(function (info) {
         return db.put({
           _id: info.id,
           _rev: info.rev,
@@ -131,8 +128,6 @@ adapters.forEach(function (adapter) {
         }).then(function (info2) {
           info.rev.should.not.equal(info2.rev);
         });
-      }).catch(done).then(function () {
-        done();
       });
     });
 
@@ -144,11 +139,10 @@ adapters.forEach(function (adapter) {
       });
     });
 
-    it('Read db id with promise', function (done) {
+    it('Read db id with promise', function () {
       var db = new PouchDB(dbs.name);
-      db.id().then(function (id) {
+      return db.id().then(function (id) {
         id.should.be.a('string');
-        done();
       });
     });
 
@@ -158,9 +152,9 @@ adapters.forEach(function (adapter) {
       });
     });
 
-    it('Close db with a promise', function (done) {
-      new PouchDB(dbs.name, function (err, db) {
-        db.close().then(done, done);
+    it('Close db with a promise', function () {
+      return new PouchDB(dbs.name).then(function (db) {
+        return db.close();
       });
     });
 
@@ -406,9 +400,9 @@ adapters.forEach(function (adapter) {
       });
     });
 
-    it('Bulk docs with a promise', function (done) {
+    it('Bulk docs with a promise', function () {
       var db = new PouchDB(dbs.name);
-      db.bulkDocs({
+      return db.bulkDocs({
         docs: [
           { test: 'somestuff' },
           { test: 'another' }
@@ -417,8 +411,7 @@ adapters.forEach(function (adapter) {
         infos.length.should.equal(2);
         infos[0].ok.should.equal(true);
         infos[1].ok.should.equal(true);
-        done();
-      }).catch(done);
+      });
     });
 
     it('Basic checks', function (done) {
