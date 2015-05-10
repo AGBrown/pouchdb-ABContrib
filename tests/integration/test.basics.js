@@ -25,11 +25,10 @@ adapters.forEach(function (adapter) {
       });
     });
 
-    it('Create a pouch with a promise', function (done) {
-      new PouchDB(dbs.name).then(function (db) {
+    it('Create a pouch with a promise', function () {
+      return new PouchDB(dbs.name).then(function (db) {
         db.should.be.an.instanceof(PouchDB);
-        done();
-      }, done);
+      });
     });
 
     it('Catch an error when creating a pouch with a promise', function (done) {
@@ -201,19 +200,18 @@ adapters.forEach(function (adapter) {
       });
     });
 
-    it('Remove doc with a promise', function (done) {
+    it('Remove doc with a promise', function () {
       var db = new PouchDB(dbs.name);
-      db.post({test: 'someotherstuff'}).then(function (info) {
+      return db.post({test: 'someotherstuff'}).then(function (info) {
         return db.remove({
           test: 'someotherstuff',
           _id: info.id,
           _rev: info.rev
         }).then(function () {
           return db.get(info.id).then(function (doc) {
-            done(true);
+            throw new Error('shouldn\'t have gotten here');
           }, function (err) {
             should.exist(err.error);
-            done();
           });
         });
       });
@@ -232,19 +230,18 @@ adapters.forEach(function (adapter) {
       });
     });
 
-    it('Remove doc with new syntax and a promise', function (done) {
+    it('Remove doc with new syntax and a promise', function () {
       var db = new PouchDB(dbs.name);
       var id;
-      db.post({test: 'someotherstuff'}).then(function (info) {
+      return db.post({test: 'someotherstuff'}).then(function (info) {
         id = info.id;
         return db.remove(info.id, info.rev);
       }).then(function () {
         return db.get(id);
       }).then(function (doc) {
-        done(true);
+        throw new Error('shouldn\'t have gotten here');
       }, function (err) {
         should.exist(err.error);
-        done();
       });
     });
 
