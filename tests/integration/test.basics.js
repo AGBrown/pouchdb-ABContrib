@@ -737,11 +737,10 @@ adapters.forEach(function (adapter) {
       });
     });
 
-    it('db.info should give correct name', function (done) {
+    it('db.info should give correct name', function () {
       var db = new PouchDB(dbs.name);
-      db.info().then(function (info) {
+      return db.info().then(function (info) {
         info.db_name.should.equal('testdb');
-        done();
       });
     });
 
@@ -760,9 +759,9 @@ adapters.forEach(function (adapter) {
       });
     });
 
-    it('db.info should give correct doc_count', function (done) {
-      new PouchDB(dbs.name).then(function (db) {
-        db.info().then(function (info) {
+    it('db.info should give correct doc_count', function () {
+      return new PouchDB(dbs.name).then(function (db) {
+        return db.info().then(function (info) {
           info.doc_count.should.equal(0);
           return db.bulkDocs({docs : [{_id : '1'}, {_id : '2'}, {_id : '3'}]});
         }).then(function () {
@@ -776,9 +775,8 @@ adapters.forEach(function (adapter) {
           return db.info();
         }).then(function (info) {
           info.doc_count.should.equal(2);
-          done();
-        }, done);
-      }, done);
+        });
+      });
     });
 
     it('putting returns {ok: true}', function () {
@@ -830,11 +828,11 @@ adapters.forEach(function (adapter) {
       }, done);
     });
 
-    it('issue 2779, deleted docs, old revs COUCHDB-292', function (done) {
+    it('issue 2779, deleted docs, old revs COUCHDB-292', function () {
       var db =  new PouchDB(dbs.name);
       var rev;
 
-      db.put({_id: 'foo'}).then(function (resp) {
+      return db.put({_id: 'foo'}).then(function (resp) {
         rev = resp.rev;
         return db.remove('foo', rev);
       }).then(function () {
@@ -842,10 +840,9 @@ adapters.forEach(function (adapter) {
       }).catch(function (err) {
         return db.put({_id: 'foo', _rev: rev});
       }).then(function () {
-        done(new Error('should never have got here'));
+        throw new Error('should never have got here');
       }, function (err) {
         should.exist(err);
-        done();
       });
     });
 
