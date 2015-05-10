@@ -671,26 +671,26 @@ adapters.forEach(function (adapter) {
       });
     });
 
-    it('Fail to fetch a doc after db was deleted', function (done) {
-      new PouchDB(dbs.name, function (err, db) {
+    it('Fail to fetch a doc after db was deleted', function () {
+      var doc = { _id: 'foodoc' };
+      var doc2 = { _id: 'foodoc2' };
+      return new PouchDB(dbs.name).then(function (db) {
         var db2 = new PouchDB(dbs.name);
-        var doc = { _id: 'foodoc' };
-        var doc2 = { _id: 'foodoc2' };
-        db.put(doc, function () {
-          db2.put(doc2, function () {
-            db.allDocs(function (err, docs) {
-              docs.total_rows.should.equal(2);
-              db.destroy().then(function () {
-                db2 = new PouchDB(dbs.name);
-                db2.get(doc._id, function (err, doc) {
-                  should.not.exist(doc);
-                  err.status.should.equal(404);
-                  done();
-                });
-              });
-            });
-          });
+        return db.put(doc).then(function () {
+          return db2.put(doc2);
+        }).then(function () {
+          return db.allDocs();
+        }).then(function (docs) {
+          docs.total_rows.should.equal(2);
+          return db.destroy();
         });
+      }).then(function () {
+        var db2 = new PouchDB(dbs.name);
+        return db2.get(doc._id);
+      }).then(function (doc) {
+        throw new Error('get doc after db.destroy should fail');
+      }, function (err) {
+        err.status.should.equal(404);
       });
     });
 
